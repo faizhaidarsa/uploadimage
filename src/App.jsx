@@ -6,7 +6,8 @@ export class App extends Component {
   state={
     daftarGambar:[],
     filename:'',
-    file:null
+    file:null,
+    productprice:null
   }
 
   componentDidMount() {
@@ -14,20 +15,24 @@ export class App extends Component {
   }
   
   getAllData=()=>{
-    Axios.get('http://localhost:9000/getall').
-    then((res)=>{this.setState({daftarGambar:res.data})}).
-    catch((err)=>{console.log(err);
+    Axios.get(
+      'http://localhost:9000/getall'
+    ).then((res)=>{
+      this.setState({daftarGambar:res.data})
+    }).catch((err)=>{
+      console.log(err)
     })
   }
 
   renderTable=()=>{
     let hasil = this.state.daftarGambar.map((item,key)=>{
-      let url =`http://localhost:9000/files/${item.image}`
+      let url =`http://localhost:9000/${item.image}`
       return(
         <tr key={key}>
-          <td>{item.id}</td>
-          <td>{item.name}</td>
-          <td><img width='150px' src={url} alt=""/></td>
+          <td className='text-center'>{item.id}</td>
+          <td className='text-center'>{item.name}</td>
+          <td className='text-center'>Rp {item.price}</td>
+          <td className='d-flex justify-content-center'><img width='150px' src={url} alt=""/></td>
         </tr>
       )
     })
@@ -46,7 +51,15 @@ export class App extends Component {
   uploadImage=()=>{
     var fd = new FormData()
     fd.append('gambar', this.state.file, this.state.file.name)
-    fd.append('namagambar',this.state.filename)
+    // pakai split
+    // fd.append('propgambar',`${this.state.productprice}|-|${this.state.filename}`)
+    
+    let produk={
+      price:this.state.productprice,
+      nama:this.state.filename
+    }
+    produk = JSON.stringify(produk)
+    fd.append('propgambar',produk)
     Axios.post(
       'http://localhost:9000/uploadimage',fd
     ).then((res)=>{
@@ -70,6 +83,7 @@ export class App extends Component {
                 <tr className="text-center">
                   <th>ID</th>
                   <th>Nama</th>
+                  <th>Harga</th>
                   <th>Gambar</th>
                 </tr>
               </thead>
@@ -79,8 +93,11 @@ export class App extends Component {
           </div>
           <div className='card-footer'>
           <div className="row">
-            <div className="col-8">
-                <input className='form-control' onChange={(e)=>{this.setState({filename:e.target.value})}} placeholder='Type image name here . . .' type="text"/>
+            <div className="col-4">
+                <input className='form-control' onChange={(e)=>{this.setState({filename:e.target.value})}} placeholder='Product name . . .' type="text"/>
+              </div>
+            <div className="col-4">
+                <input className='form-control' onChange={(e)=>{this.setState({productprice:e.target.value})}} placeholder='Price . . .' type="number" min='0'/>
               </div>
               <div className="col-4">
                 <input className="d-none" onChange={(e)=>{this.setState({file:e.target.files[0]})}} type="file" ref="fileUpload" />
