@@ -63,7 +63,7 @@ export class App extends Component {
     Axios.post(
       'http://localhost:9000/uploadimage',fd
     ).then((res)=>{
-      console.log(res);
+      //console.log(res);
       this.getAllData()
     }).catch((err)=>{
       console.log(err);
